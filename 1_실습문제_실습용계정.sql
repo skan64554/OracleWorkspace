@@ -1,0 +1,38 @@
+-- 춘 기술대학교 학과 이름과 계열 표시
+-- 출력 헤더는 "학과 명" , "계열"로 표시
+SELECT DEPARTMENT_NAME 학과명 , CATEGORY 계열
+FROM TB_DEPARTMENT;
+
+-- 학과의 학과 정원을 표시
+-- xx학과의 정원은 xx명입니다.
+SELECT DEPARTMENT_NAME || '학과의 정원은 '
+|| CAPACITY || '명입니다'
+FROM TB_DEPARTMENT;
+
+-- "국어국문학과"에 다니는 여학생중 휴학생 찾기
+-- 학과코드는 학과 테이블(TB_DEPARTMENT)을 조회해서 찾자
+SELECT STUDENT_NAME
+FROM TB_STUDENT
+WHERE DEPARTMENT_NO = (
+    SELECT DEPARTMENT_NO
+    FROM TB_DEPARTMENT
+    WHERE DEPARTMENT_NAME = '국어국문학과'
+)
+AND ABSENCE_YN = 'Y'
+AND (STUDENT_SSN LIKE ('______-2%') OR STUDENT_SSN LIKE ('______-4%'));
+
+-- 도서관에서 대출 도서 장기 연체자 찾기
+-- 대상자들의 학번
+-- A513079 , A513090, A513091, A513110, A513119
+SELECT STUDENT_NAME
+FROM TB_STUDENT
+WHERE STUDENT_NO IN 
+('A513079','A513090','A513091','A513110','A513119')
+ORDER BY STUDENT_NAME DESC;
+
+-- 입학정원이 20명 이상 30명 이하인 학과들의
+-- 학과 이름과 계열 출력
+SELECT DEPARTMENT_NAME , CATEGORY
+FROM TB_DEPARTMENT
+WHERE CAPACITY BETWEEN 20 AND 30;
+
