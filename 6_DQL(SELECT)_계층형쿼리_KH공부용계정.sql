@@ -40,8 +40,6 @@
 
 -- 계층형 쿼리 샘플 스크립트 시작--
 -- 1개의 테이블에서 데이터를 관리하는경우 (댓글)
--- 계층형 쿼리 샘플 스크립트 시작--
--- 1개의 테이블에서 데이터를 관리하는경우 (댓글)
 CREATE TABLE comments (
     comment_id NUMBER PRIMARY KEY,      -- 댓글 ID
     parent_id NUMBER,                   -- 부모 댓글 ID (루트 댓글은 NULL)
