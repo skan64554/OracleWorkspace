@@ -56,5 +56,85 @@ SELECT * FROM EMP_01;
        - 데이터베이스가 일관성을 유지한다는 것은 데이터가 "정의된 제약조건을 준수"함을 의미함
     
 */
-    Isolation
-    Durablity
+-- 제약조건이 추가된 테이블에 제약조건을 준수한 데이터,
+-- 준수하지 않은 데이터를 추가
+ALTER TABLE EMP_01 ADD PRIMARY KEY(EMP_ID);
+
+-- 기본키 제약조건 위배.
+-- 데이터베이스의 일관성 유지를 위해 아래 DML문은 트랜잭션에 추가도 안됨
+INSERT INTO EMP_01 VALUES(200,'선동일2','총무부');
+INSERT INTO EMP_01 VALUES(800,'선동일2','총무부');
+COMMIT;
+
+/*
+    3. Isolation(격리성)
+     - 서로 다른 세션에서 동시에 여러 트랜잭션이 실행되는 경우, 각 트랜잭션이
+     서로의 작업에 영향을 끼치지 않고 독립적으로 실행됨을 보장하는 속성
+     - 만약 하나의 테이블에 대해 동시에 여러 세션에서 DML이 수행되는 경우, 내가
+     테이블의 중간상태를 보고 작성한 코드가 제대로 실행되지 않을 수 있다.
+     이를 방지하기 위해서 RDBMS는 트랜잭션의 DML이 완전히 COMMIT, ROLLBACK되기 전까지는
+     다른 세션에서 DML을  수행하지 못하도록 LOCK을 걸어버린다
+     
+     -- 1) 선동일 사원의 DEPT_CODE를 D2로 바꿔라
+     UPDATE EMPLOYEE SET DEPT_CODE = 'D2' WHERE EMP_NAME  = '선동일';
+     -- 2) 사번이 200번인 사원의 이름을 '민동일'로 바꿔라.
+     UPDATE EMPLOYEE SET EMP_NAME = '민동일' WHERE EMP_ID ='200';
+*/
+-- 사번이 200번인 사원 삭제
+DELETE FROM EMP_02
+WHERE EMP_ID = 200;
+-- 사번이 801, 홍길동, 총무부 사원 추가
+INSERT INTO EMP_02 
+VALUES(801,'홍길동','총무부');
+COMMIT;
+
+/*
+    4. Durability(지속성)
+     - 한번 반영된 트랜잭션은 DMBS에 영구히 반영되도록 보장하는 속성
+*/
+
+-- SAVEPOINT , ROLLBACK TO
+-- EMP_01테이블에서 사번이 217,216,214인 사원 삭제
+DELETE FROM EMP_01
+WHERE EMP_ID IN (217,216,214);
+
+SELECT * FROM EMP_01;
+
+SAVEPOINT SP1;
+
+-- 사번이 218번인 사원 삭제
+DELETE FROM EMP_01
+WHERE EMP_ID = 219;
+
+SELECT * FROM EMP_01;
+
+-- 사원 수 24
+INSERT INTO EMP_01
+VALUES (999, '김말똥','인사부');
+
+-- 사원 수 25
+
+ROLLBACK TO SP1;
+
+SELECT * FROM EMP_01;
+
+/*
+    주의사항
+    DDL구문(CREATE, ALTER, DROP)을 실행하는 순간 기존 트랜잭션에 있던 모든 변경사항들은
+    무조건 COMMIT을 시킨 후에 DDL이 수행된다.
+*/
+COMMIT; -- 25명 확정
+DELETE FROM EMP_01;
+
+-- 테이블 생성
+CREATE TABLE TEST (
+    TID NUMBER
+);
+
+ROLLBACK;
+
+SELECT * FROM EMP_01; -- 롤백을 했음에도 불구하고 데이터 X
+
+
+
+
